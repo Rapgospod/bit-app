@@ -1,149 +1,419 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>Bit Them All - Degen Edition</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+  <title>Bit Them All — Tap</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    body {
-      margin: 0;
-      font-family: 'Arial', sans-serif;
-      background: linear-gradient(180deg, #0f0f0f, #1a1a1a);
-      color: #fff;
-      text-align: center;
-      padding: 30px;
+    :root{
+      --bg1:#0b0b0c;
+      --bg2:#141417;
+      --card:#1b1b1f;
+      --muted:#a9a9b2;
+      --accent:#00ff99;
+      --warn:#ffcc00;
+      --shadow: 0 16px 40px rgba(0,0,0,.45);
+      --radius: 18px;
     }
 
-    h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: Arial, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color:#fff;
+      background: radial-gradient(1200px 700px at 50% 0%, #1f1f25 0%, var(--bg1) 55%, #070708 100%);
+      min-height:100vh;
+      padding: 18px 16px 28px;
+      display:flex;
+      justify-content:center;
     }
 
-    .card {
-      background: #1f1f1f;
-      border-radius: 16px;
-      padding: 20px;
-      margin: 15px auto;
-      width: 250px;
+    .wrap{
+      width:min(420px, 100%);
     }
 
-    .big {
-      font-size: 42px;
-      margin: 10px 0;
+    .top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
     }
 
-    button {
-      background: #00ff99;
-      border: none;
-      padding: 15px 40px;
-      font-size: 20px;
-      border-radius: 12px;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
+    .title{
+      font-size:18px;
+      line-height:1.2;
+      margin:0;
+      font-weight:700;
+      letter-spacing:.2px;
+    }
+    .sub{
+      margin:4px 0 0;
+      color:var(--muted);
+      font-size:12px;
     }
 
-    button:active {
-      transform: scale(0.95);
+    .pill{
+      padding:8px 10px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius: 999px;
+      font-size:12px;
+      color:#e9e9f0;
+      box-shadow: 0 10px 28px rgba(0,0,0,.25);
+      white-space:nowrap;
     }
 
-    .energy {
-      color: #ffcc00;
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      backdrop-filter: blur(10px);
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-bottom:12px;
+    }
+
+    .stat .label{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:6px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .stat .value{
+      font-size:34px;
+      font-weight:800;
+      letter-spacing:.5px;
+    }
+
+    .tapArea{
+      margin-top:12px;
+      position:relative;
+      overflow:hidden;
+      padding: 18px 14px;
+    }
+
+    .bunnyWrap{
+      position:relative;
+      width: 190px;
+      height: 190px;
+      margin: 8px auto 10px;
+      display:grid;
+      place-items:center;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .bunnyGlow{
+      position:absolute;
+      inset:-18px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 50% 50%, rgba(0,255,153,.22), rgba(0,255,153,.05), transparent 70%);
+      filter: blur(2px);
+      opacity:.9;
+      pointer-events:none;
+    }
+
+    #bunny{
+      width: 170px;
+      height: 170px;
+      object-fit: contain;
+      border-radius: 24px;
+      filter: drop-shadow(0 18px 36px rgba(0,0,0,.55));
+      transform: translateZ(0);
+      transition: transform .08s ease;
+      will-change: transform;
+    }
+
+    .bunnyWrap:active #bunny{
+      transform: scale(0.97);
+    }
+
+    .shake{
+      animation: shake .22s ease;
+    }
+    @keyframes shake{
+      0%{ transform: translateY(0) scale(1); }
+      30%{ transform: translateY(-8px) scale(1.03); }
+      65%{ transform: translateY(2px) scale(0.99); }
+      100%{ transform: translateY(0) scale(1); }
+    }
+
+    .cta{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:center;
       margin-top: 10px;
+      flex-wrap:wrap;
     }
 
-    #bunny {
-      width: 120px;
-      margin: 20px auto;
-      display: block;
-      transition: transform 0.2s;
+    .btn{
+      background: var(--accent);
+      color:#062014;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 18px;
+      font-weight:800;
+      font-size:16px;
+      cursor:pointer;
+      box-shadow: 0 16px 40px rgba(0,255,153,.18);
+      min-width: 170px;
+    }
+    .btn:active{ transform: scale(0.98); }
+
+    .btn.secondary{
+      background: rgba(255,255,255,.06);
+      color:#fff;
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: none;
+      min-width: 120px;
+      font-weight:700;
     }
 
-    .click-effect {
-      position: absolute;
-      border-radius: 50%;
-      background: #00ff99aa;
-      width: 40px;
-      height: 40px;
-      pointer-events: none;
-      animation: pop 0.4s forwards;
+    .energyLine{
+      margin-top: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      color: var(--muted);
+      font-size:12px;
     }
 
-    @keyframes pop {
-      0% { transform: scale(0); opacity: 1; }
-      100% { transform: scale(2); opacity: 0; }
+    .bar{
+      margin-top: 8px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+    .bar > div{
+      height:100%;
+      width: 50%;
+      background: linear-gradient(90deg, rgba(0,255,153,.95), rgba(0,255,153,.55));
+      border-radius: 999px;
+      transition: width .25s ease;
+    }
+
+    .hint{
+      margin: 12px 0 0;
+      color: rgba(255,255,255,.75);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    /* floating +1 */
+    .float{
+      position:absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-weight: 900;
+      font-size: 18px;
+      color: var(--accent);
+      text-shadow: 0 10px 26px rgba(0,255,153,.25);
+      pointer-events:none;
+      opacity: 0;
+      animation: floatUp .75s ease forwards;
+      will-change: transform, opacity;
+    }
+    @keyframes floatUp{
+      0%{ opacity: 0; transform: translate(-50%, -10%) scale(.9); }
+      15%{ opacity: 1; }
+      100%{ opacity: 0; transform: translate(-50%, -130%) scale(1.2); }
+    }
+
+    .toast{
+      margin-top:10px;
+      font-size:12px;
+      color: var(--warn);
+      min-height: 16px;
     }
   </style>
 </head>
 <body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <p class="title" id="username">Welcome</p>
+        <p class="sub">Bit Them All • tap-game prototype</p>
+      </div>
+      <div class="pill" id="netPill">offline progress</div>
+    </div>
 
-<h1 id="username">Loading...</h1>
+    <div class="stats">
+      <div class="card stat">
+        <div class="label">💰 BIT Balance</div>
+        <div class="value" id="balance">0</div>
+      </div>
+      <div class="card stat">
+        <div class="label">⚡ Energy</div>
+        <div class="value"><span id="energy">10</span><span style="font-size:14px;color:var(--muted);font-weight:700"> /10</span></div>
+      </div>
+    </div>
 
-<img id="bunny" src="https://i.imgur.com/3fJ1Pbm.png" alt="Degen Bunny">
+    <div class="card tapArea" id="tapArea">
+      <div class="bunnyWrap" id="bunnyWrap" aria-label="Tap bunny">
+        <div class="bunnyGlow"></div>
+        <!-- ✅ ПРАВИЛЬНАЯ raw ссылка (из твоего permalink) -->
+        <img id="bunny" src="https://raw.githubusercontent.com/Rapgospod/bit-app/6b2bcc75348d5bc50380e7accb13a438d623d9db/pepebunny.png" alt="pepebunny" />
+      </div>
 
-<div class="card">
-  <div>💰 BIT Balance</div>
-  <div id="balance" class="big">0</div>
-</div>
+      <div class="cta">
+        <button class="btn" id="bitBtn">⚡ TAP BIT</button>
+        <button class="btn secondary" id="resetBtn">Reset</button>
+      </div>
 
-<div class="card">
-  <button id="bitBtn">⚡ BIT</button>
-  <div class="energy">Energy: <span id="energy">10</span>/10</div>
-</div>
+      <div class="energyLine">
+        <span>regen: +1 energy / 3s</span>
+        <span id="regenState">ready</span>
+      </div>
+      <div class="bar"><div id="energyBar"></div></div>
 
-<script>
-  let tg = window.Telegram.WebApp;
-  tg.expand();
+      <div class="toast" id="toast"></div>
+      <div class="hint">Тапай банни или кнопку. Прогресс сохраняется в твоём браузере (localStorage). Дальше добавим апгрейды/квесты/бонусы.</div>
+    </div>
+  </div>
 
-  let user = tg.initDataUnsafe.user;
-  if (user) document.getElementById("username").innerText = "Welcome, " + (user.first_name || "Degen");
+  <script>
+    const tg = window.Telegram?.WebApp;
+    if (tg) tg.expand();
 
-  let balance = localStorage.getItem("balance") ? parseInt(localStorage.getItem("balance")) : 0;
-  let energy = localStorage.getItem("energy") ? parseInt(localStorage.getItem("energy")) : 10;
+    const user = tg?.initDataUnsafe?.user;
+    const usernameEl = document.getElementById("username");
+    usernameEl.textContent = "Welcome" + (user?.first_name ? ", " + user.first_name : ", Degen");
 
-  const balanceEl = document.getElementById("balance");
-  const energyEl = document.getElementById("energy");
-  const bitBtn = document.getElementById("bitBtn");
-  const bunny = document.getElementById("bunny");
+    // UI elements
+    const balanceEl = document.getElementById("balance");
+    const energyEl = document.getElementById("energy");
+    const energyBar = document.getElementById("energyBar");
+    const toast = document.getElementById("toast");
+    const regenState = document.getElementById("regenState");
+    const bunnyWrap = document.getElementById("bunnyWrap");
+    const tapArea = document.getElementById("tapArea");
+    const netPill = document.getElementById("netPill");
 
-  balanceEl.innerText = balance;
-  energyEl.innerText = energy;
+    const MAX_ENERGY = 10;
+    const REGEN_MS = 3000;
 
-  function addBit(e) {
-    if (energy <= 0) return;
+    // state
+    let balance = Number(localStorage.getItem("balance") || 0);
+    let energy  = Number(localStorage.getItem("energy")  || MAX_ENERGY);
 
-    balance++;
-    energy--;
-    balanceEl.innerText = balance;
-    energyEl.innerText = energy;
-    localStorage.setItem("balance", balance);
-    localStorage.setItem("energy", energy);
-
-    // Анимация кнопки
-    bunny.style.transform = "scale(1.2)";
-    setTimeout(()=> bunny.style.transform="scale(1)", 100);
-
-    // Эффект клика
-    const circle = document.createElement("div");
-    circle.classList.add("click-effect");
-    const rect = bitBtn.getBoundingClientRect();
-    circle.style.left = (e.clientX - rect.left - 20) + "px";
-    circle.style.top = (e.clientY - rect.top - 20) + "px";
-    bitBtn.appendChild(circle);
-    setTimeout(() => circle.remove(), 400);
-  }
-
-  bitBtn.addEventListener("click", addBit);
-
-  // Восстановление энергии
-  setInterval(() => {
-    if (energy < 10) {
-      energy++;
-      energyEl.innerText = energy;
-      localStorage.setItem("energy", energy);
+    function save(){
+      localStorage.setItem("balance", String(balance));
+      localStorage.setItem("energy", String(energy));
     }
-  }, 3000);
-</script>
 
+    function render(){
+      balanceEl.textContent = balance;
+      energyEl.textContent = energy;
+      energyBar.style.width = `${(energy / MAX_ENERGY) * 100}%`;
+      netPill.textContent = tg ? "tg mini app" : "browser preview";
+    }
+
+    function vibrate(){
+      try { tg?.HapticFeedback?.impactOccurred("light"); } catch(e){}
+      try { navigator.vibrate?.(15); } catch(e){}
+    }
+
+    function floatText(x, y, text){
+      const el = document.createElement("div");
+      el.className = "float";
+      el.textContent = text;
+
+      // position relative to tapArea
+      const rect = tapArea.getBoundingClientRect();
+      const px = x - rect.left;
+      const py = y - rect.top;
+
+      el.style.left = px + "px";
+      el.style.top  = py + "px";
+      el.style.transform = "translate(-50%, -50%)";
+      tapArea.appendChild(el);
+
+      setTimeout(() => el.remove(), 800);
+    }
+
+    function bunnyPop(){
+      bunnyWrap.classList.remove("shake");
+      // force reflow to restart animation
+      void bunnyWrap.offsetWidth;
+      bunnyWrap.classList.add("shake");
+    }
+
+    function showToast(msg){
+      toast.textContent = msg || "";
+      if (!msg) return;
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(()=> toast.textContent="", 900);
+    }
+
+    function tap(x, y){
+      if (energy <= 0){
+        showToast("No energy 😵 wait regen...");
+        return;
+      }
+      balance += 1;
+      energy  -= 1;
+      save();
+      render();
+      vibrate();
+      bunnyPop();
+      floatText(x, y, "+1 BIT");
+    }
+
+    // button tap
+    document.getElementById("bitBtn").addEventListener("click", (e)=>{
+      const r = tapArea.getBoundingClientRect();
+      tap(r.left + r.width/2, r.top + r.height/2);
+    });
+
+    // tap bunny (mouse)
+    bunnyWrap.addEventListener("click", (e)=>{
+      tap(e.clientX, e.clientY);
+    });
+
+    // tap bunny (touch) — чтоб координаты были точные на телефоне
+    bunnyWrap.addEventListener("touchstart", (e)=>{
+      const t = e.touches?.[0];
+      if (!t) return;
+      tap(t.clientX, t.clientY);
+    }, {passive:true});
+
+    // reset
+    document.getElementById("resetBtn").addEventListener("click", ()=>{
+      balance = 0;
+      energy = MAX_ENERGY;
+      save();
+      render();
+      showToast("Reset ✅");
+      try { tg?.HapticFeedback?.notificationOccurred("success"); } catch(e){}
+    });
+
+    // regen
+    setInterval(()=>{
+      if (energy < MAX_ENERGY){
+        energy += 1;
+        save();
+        render();
+        regenState.textContent = "regen +1";
+        setTimeout(()=> regenState.textContent="ready", 350);
+      }
+    }, REGEN_MS);
+
+    render();
+  </script>
 </body>
 </html>
