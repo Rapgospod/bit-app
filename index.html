@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
-  <title>Bit Them All — Tap</title>
+  <title>Bit Them All — Tap Game</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -13,10 +13,10 @@
       --muted:#a9a9b2;
       --accent:#00ff99;
       --warn:#ffcc00;
+      --danger:#ff5b7a;
       --shadow: 0 16px 40px rgba(0,0,0,.45);
       --radius: 18px;
     }
-
     *{ box-sizing:border-box; }
     body{
       margin:0;
@@ -28,31 +28,14 @@
       display:flex;
       justify-content:center;
     }
-
-    .wrap{
-      width:min(420px, 100%);
-    }
+    .wrap{ width:min(430px, 100%); }
 
     .top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:14px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; margin-bottom:14px;
     }
-
-    .title{
-      font-size:18px;
-      line-height:1.2;
-      margin:0;
-      font-weight:700;
-      letter-spacing:.2px;
-    }
-    .sub{
-      margin:4px 0 0;
-      color:var(--muted);
-      font-size:12px;
-    }
+    .title{ font-size:18px; line-height:1.2; margin:0; font-weight:800; letter-spacing:.2px; }
+    .sub{ margin:4px 0 0; color:var(--muted); font-size:12px; }
 
     .pill{
       padding:8px 10px;
@@ -65,135 +48,88 @@
       white-space:nowrap;
     }
 
+    .row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
     .card{
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       border: 1px solid rgba(255,255,255,.09);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding: 16px;
+      padding: 14px;
       backdrop-filter: blur(10px);
     }
 
-    .stats{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
-      margin-bottom:12px;
-    }
+    .stats{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:12px; }
+    .stat .label{ color:var(--muted); font-size:12px; margin-bottom:6px; display:flex; align-items:center; gap:6px; }
+    .stat .value{ font-size:32px; font-weight:900; letter-spacing:.5px; }
 
-    .stat .label{
-      color:var(--muted);
-      font-size:12px;
-      margin-bottom:6px;
-      display:flex;
-      align-items:center;
-      gap:6px;
-    }
-    .stat .value{
-      font-size:34px;
-      font-weight:800;
-      letter-spacing:.5px;
-    }
+    .mini{ font-size:12px; color:rgba(255,255,255,.78); margin-top:6px; }
+    .mini b{ color:#fff; }
 
-    .tapArea{
-      margin-top:12px;
-      position:relative;
-      overflow:hidden;
-      padding: 18px 14px;
-    }
-
+    .tapArea{ position:relative; overflow:hidden; padding: 14px; }
     .bunnyWrap{
-      position:relative;
-      width: 190px;
-      height: 190px;
-      margin: 8px auto 10px;
-      display:grid;
-      place-items:center;
-      user-select:none;
-      -webkit-tap-highlight-color: transparent;
+      position:relative; width: 205px; height: 205px; margin: 6px auto 10px;
+      display:grid; place-items:center;
+      user-select:none; -webkit-tap-highlight-color: transparent;
     }
-
     .bunnyGlow{
-      position:absolute;
-      inset:-18px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 50% 50%, rgba(0,255,153,.22), rgba(0,255,153,.05), transparent 70%);
+      position:absolute; inset:-20px; border-radius:999px;
+      background: radial-gradient(circle at 50% 50%, rgba(0,255,153,.24), rgba(0,255,153,.06), transparent 70%);
       filter: blur(2px);
-      opacity:.9;
       pointer-events:none;
+      opacity:.95;
     }
-
     #bunny{
-      width: 170px;
-      height: 170px;
-      object-fit: contain;
-      border-radius: 24px;
+      width: 182px; height: 182px; object-fit:contain; border-radius: 26px;
       filter: drop-shadow(0 18px 36px rgba(0,0,0,.55));
       transform: translateZ(0);
       transition: transform .08s ease;
       will-change: transform;
     }
+    .bunnyWrap:active #bunny{ transform: scale(0.97); }
 
-    .bunnyWrap:active #bunny{
-      transform: scale(0.97);
-    }
-
-    .shake{
-      animation: shake .22s ease;
-    }
+    .shake{ animation: shake .22s ease; }
     @keyframes shake{
       0%{ transform: translateY(0) scale(1); }
-      30%{ transform: translateY(-8px) scale(1.03); }
+      30%{ transform: translateY(-9px) scale(1.03); }
       65%{ transform: translateY(2px) scale(0.99); }
       100%{ transform: translateY(0) scale(1); }
     }
 
-    .cta{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      justify-content:center;
-      margin-top: 10px;
-      flex-wrap:wrap;
-    }
-
+    .cta{ display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; margin-top: 8px; }
     .btn{
-      background: var(--accent);
-      color:#062014;
-      border: none;
-      border-radius: 14px;
-      padding: 14px 18px;
-      font-weight:800;
-      font-size:16px;
+      background: var(--accent); color:#062014;
+      border: none; border-radius: 14px;
+      padding: 14px 16px;
+      font-weight:900; font-size:15px;
       cursor:pointer;
       box-shadow: 0 16px 40px rgba(0,255,153,.18);
-      min-width: 170px;
+      min-width: 160px;
     }
     .btn:active{ transform: scale(0.98); }
-
     .btn.secondary{
       background: rgba(255,255,255,.06);
       color:#fff;
       border: 1px solid rgba(255,255,255,.10);
-      box-shadow: none;
+      box-shadow:none;
       min-width: 120px;
-      font-weight:700;
+      font-weight:800;
+    }
+    .btn.danger{
+      background: rgba(255,91,122,.14);
+      color: #ffd6de;
+      border:1px solid rgba(255,91,122,.25);
+      box-shadow:none;
+      min-width:120px;
     }
 
     .energyLine{
       margin-top: 12px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      color: var(--muted);
-      font-size:12px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      color: var(--muted); font-size:12px;
     }
-
     .bar{
       margin-top: 8px;
-      height: 10px;
-      border-radius: 999px;
+      height: 10px; border-radius:999px;
       background: rgba(255,255,255,.07);
       border: 1px solid rgba(255,255,255,.10);
       overflow:hidden;
@@ -202,43 +138,85 @@
       height:100%;
       width: 50%;
       background: linear-gradient(90deg, rgba(0,255,153,.95), rgba(0,255,153,.55));
-      border-radius: 999px;
+      border-radius:999px;
       transition: width .25s ease;
     }
 
-    .hint{
-      margin: 12px 0 0;
-      color: rgba(255,255,255,.75);
-      font-size: 12px;
-      line-height: 1.45;
-    }
+    .toast{ margin-top:10px; font-size:12px; color: var(--warn); min-height: 16px; }
 
-    /* floating +1 */
+    /* floating */
     .float{
       position:absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
       font-weight: 900;
       font-size: 18px;
-      color: var(--accent);
-      text-shadow: 0 10px 26px rgba(0,255,153,.25);
       pointer-events:none;
       opacity: 0;
-      animation: floatUp .75s ease forwards;
       will-change: transform, opacity;
+      animation: floatUp .85s ease forwards;
+      text-shadow: 0 10px 26px rgba(0,0,0,.35);
     }
     @keyframes floatUp{
       0%{ opacity: 0; transform: translate(-50%, -10%) scale(.9); }
-      15%{ opacity: 1; }
-      100%{ opacity: 0; transform: translate(-50%, -130%) scale(1.2); }
+      18%{ opacity: 1; }
+      100%{ opacity: 0; transform: translate(-50%, -160%) scale(1.2); }
     }
 
-    .toast{
+    .spark{
+      position:absolute;
+      width: 10px; height: 10px; border-radius: 999px;
+      background: rgba(0,255,153,.85);
+      pointer-events:none;
+      opacity:.9;
+      animation: spark .55s ease forwards;
+      filter: blur(.2px);
+    }
+    @keyframes spark{
+      0%{ transform: translate(-50%,-50%) scale(1); opacity:.95; }
+      100%{ transform: translate(var(--dx), var(--dy)) scale(.3); opacity:0; }
+    }
+
+    .modalBack{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.55);
+      display:none; align-items:flex-end; justify-content:center;
+      padding: 14px;
+    }
+    .modal{
+      width:min(430px,100%);
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow);
+      padding: 14px;
+      backdrop-filter: blur(12px);
+    }
+    .modalHead{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+    .modalHead h2{ margin:0; font-size:16px; }
+    .x{ border:none; background:transparent; color:#fff; font-size:22px; cursor:pointer; opacity:.8; }
+    .shopItem{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding: 12px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
       margin-top:10px;
-      font-size:12px;
-      color: var(--warn);
-      min-height: 16px;
+    }
+    .shopItem .left{ text-align:left; }
+    .shopItem .name{ font-weight:900; }
+    .shopItem .desc{ font-size:12px; color:var(--muted); margin-top:4px; }
+    .buy{
+      border:none; border-radius: 14px;
+      padding: 10px 12px;
+      font-weight:900;
+      background: rgba(0,255,153,.14);
+      color: var(--accent);
+      border:1px solid rgba(0,255,153,.25);
+      cursor:pointer;
+      min-width: 98px;
+    }
+    .buy:disabled{
+      opacity:.45;
+      cursor:not-allowed;
     }
   </style>
 </head>
@@ -246,43 +224,93 @@
   <div class="wrap">
     <div class="top">
       <div>
-        <p class="title" id="username">Welcome</p>
-        <p class="sub">Bit Them All • tap-game prototype</p>
+        <p class="title" id="username">Welcome, Degen</p>
+        <p class="sub">Combo • Crit • Daily • Upgrades</p>
       </div>
-      <div class="pill" id="netPill">offline progress</div>
+      <div class="pill" id="modePill">tg mini app</div>
     </div>
 
     <div class="stats">
       <div class="card stat">
-        <div class="label">💰 BIT Balance</div>
+        <div class="label">💰 BIT</div>
         <div class="value" id="balance">0</div>
+        <div class="mini">Level: <b id="level">1</b> • XP: <b id="xp">0</b>/<b id="xpNeed">50</b></div>
       </div>
       <div class="card stat">
         <div class="label">⚡ Energy</div>
-        <div class="value"><span id="energy">10</span><span style="font-size:14px;color:var(--muted);font-weight:700"> /10</span></div>
+        <div class="value"><span id="energy">10</span><span style="font-size:14px;color:var(--muted);font-weight:700"> /<span id="maxEnergy">10</span></span></div>
+        <div class="mini">Regen: <b id="regenMs">3000</b>ms</div>
       </div>
     </div>
 
     <div class="card tapArea" id="tapArea">
-      <div class="bunnyWrap" id="bunnyWrap" aria-label="Tap bunny">
+      <div class="row">
+        <div class="pill">🔥 Combo: <b id="combo">x1</b></div>
+        <div class="pill">💥 Crit: <b id="crit">10%</b></div>
+        <div class="pill">🎁 Daily: <b id="daily">ready</b></div>
+      </div>
+
+      <div class="bunnyWrap" id="bunnyWrap">
         <div class="bunnyGlow"></div>
-        <!-- ✅ ПРАВИЛЬНАЯ raw ссылка (из твоего permalink) -->
-        <img id="bunny" src="https://raw.githubusercontent.com/Rapgospod/bit-app/6b2bcc75348d5bc50380e7accb13a438d623d9db/pepebunny.png" alt="pepebunny" />
+        <img id="bunny"
+             src="https://raw.githubusercontent.com/Rapgospod/bit-app/6b2bcc75348d5bc50380e7accb13a438d623d9db/pepebunny.png"
+             alt="pepebunny" />
       </div>
 
       <div class="cta">
-        <button class="btn" id="bitBtn">⚡ TAP BIT</button>
-        <button class="btn secondary" id="resetBtn">Reset</button>
+        <button class="btn" id="tapBtn">⚡ TAP</button>
+        <button class="btn secondary" id="shopBtn">🛒 Shop</button>
+        <button class="btn danger" id="resetBtn">Reset</button>
       </div>
 
       <div class="energyLine">
-        <span>regen: +1 energy / 3s</span>
+        <span>regen ticks</span>
         <span id="regenState">ready</span>
       </div>
       <div class="bar"><div id="energyBar"></div></div>
 
       <div class="toast" id="toast"></div>
-      <div class="hint">Тапай банни или кнопку. Прогресс сохраняется в твоём браузере (localStorage). Дальше добавим апгрейды/квесты/бонусы.</div>
+      <div class="mini" style="margin-top:10px;color:rgba(255,255,255,.78)">
+        Быстрые тапы дают Combo (множитель). Иногда выпадает Crit (+5). Daily бонус — раз в сутки.
+      </div>
+    </div>
+  </div>
+
+  <!-- Shop Modal -->
+  <div class="modalBack" id="modalBack">
+    <div class="modal">
+      <div class="modalHead">
+        <h2>🛒 Upgrades</h2>
+        <button class="x" id="closeModal">×</button>
+      </div>
+
+      <div class="shopItem">
+        <div class="left">
+          <div class="name">⚡ Max Energy +5</div>
+          <div class="desc">Больше стамины = больше битов.</div>
+        </div>
+        <button class="buy" id="buyEnergy">Buy<br><span id="costEnergy">50</span></button>
+      </div>
+
+      <div class="shopItem">
+        <div class="left">
+          <div class="name">⏱ Regen faster</div>
+          <div class="desc">Уменьшает regen на 300ms (до минимума 1200ms).</div>
+        </div>
+        <button class="buy" id="buyRegen">Buy<br><span id="costRegen">80</span></button>
+      </div>
+
+      <div class="shopItem">
+        <div class="left">
+          <div class="name">💥 Crit chance +5%</div>
+          <div class="desc">Чаще выпадает критический тап (+5 BIT).</div>
+        </div>
+        <button class="buy" id="buyCrit">Buy<br><span id="costCrit">120</span></button>
+      </div>
+
+      <div class="mini" style="margin-top:12px;color:rgba(255,255,255,.75)">
+        Прогресс сохраняется локально (без сервера). Потом подключим рейтинг через базу.
+      </div>
     </div>
   </div>
 
@@ -294,126 +322,378 @@
     const usernameEl = document.getElementById("username");
     usernameEl.textContent = "Welcome" + (user?.first_name ? ", " + user.first_name : ", Degen");
 
-    // UI elements
+    const modePill = document.getElementById("modePill");
+    modePill.textContent = tg ? "tg mini app" : "browser preview";
+
+    // UI
     const balanceEl = document.getElementById("balance");
     const energyEl = document.getElementById("energy");
+    const maxEnergyEl = document.getElementById("maxEnergy");
     const energyBar = document.getElementById("energyBar");
     const toast = document.getElementById("toast");
     const regenState = document.getElementById("regenState");
     const bunnyWrap = document.getElementById("bunnyWrap");
     const tapArea = document.getElementById("tapArea");
-    const netPill = document.getElementById("netPill");
+    const comboEl = document.getElementById("combo");
+    const critEl = document.getElementById("crit");
+    const dailyEl = document.getElementById("daily");
+    const levelEl = document.getElementById("level");
+    const xpEl = document.getElementById("xp");
+    const xpNeedEl = document.getElementById("xpNeed");
+    const regenMsEl = document.getElementById("regenMs");
 
-    const MAX_ENERGY = 10;
-    const REGEN_MS = 3000;
+    // modal
+    const modalBack = document.getElementById("modalBack");
+    const shopBtn = document.getElementById("shopBtn");
+    const closeModal = document.getElementById("closeModal");
 
-    // state
-    let balance = Number(localStorage.getItem("balance") || 0);
-    let energy  = Number(localStorage.getItem("energy")  || MAX_ENERGY);
+    const buyEnergyBtn = document.getElementById("buyEnergy");
+    const buyRegenBtn  = document.getElementById("buyRegen");
+    const buyCritBtn   = document.getElementById("buyCrit");
+
+    const costEnergyEl = document.getElementById("costEnergy");
+    const costRegenEl  = document.getElementById("costRegen");
+    const costCritEl   = document.getElementById("costCrit");
+
+    // GAME STATE (saved)
+    const DEFAULT = {
+      balance: 0,
+      energy: 10,
+      maxEnergy: 10,
+      regenMs: 3000,
+      critChance: 0.10, // 10%
+      level: 1,
+      xp: 0,
+      lastTapAt: 0,
+      combo: 1,
+      comboEndsAt: 0,
+      lastDailyAt: 0
+    };
+
+    function load(){
+      try{
+        const raw = localStorage.getItem("bta_state");
+        return raw ? {...DEFAULT, ...JSON.parse(raw)} : {...DEFAULT};
+      }catch(e){
+        return {...DEFAULT};
+      }
+    }
+    let S = load();
 
     function save(){
-      localStorage.setItem("balance", String(balance));
-      localStorage.setItem("energy", String(energy));
+      localStorage.setItem("bta_state", JSON.stringify(S));
+    }
+
+    // costs (dynamic)
+    function costs(){
+      // растёт с улучшениями
+      const energyUp = Math.max(0, (S.maxEnergy - 10) / 5);
+      const regenUp  = Math.max(0, Math.round((3000 - S.regenMs) / 300));
+      const critUp   = Math.max(0, Math.round((S.critChance - 0.10) / 0.05));
+      return {
+        energy: 50 + energyUp * 40,
+        regen:  80 + regenUp  * 55,
+        crit:   120 + critUp  * 80,
+      };
+    }
+
+    function xpNeed(level){
+      return 50 + (level-1) * 25; // простая прогрессия
     }
 
     function render(){
-      balanceEl.textContent = balance;
-      energyEl.textContent = energy;
-      energyBar.style.width = `${(energy / MAX_ENERGY) * 100}%`;
-      netPill.textContent = tg ? "tg mini app" : "browser preview";
-    }
+      balanceEl.textContent = S.balance;
+      energyEl.textContent = S.energy;
+      maxEnergyEl.textContent = S.maxEnergy;
+      energyBar.style.width = `${(S.energy / S.maxEnergy) * 100}%`;
 
-    function vibrate(){
-      try { tg?.HapticFeedback?.impactOccurred("light"); } catch(e){}
-      try { navigator.vibrate?.(15); } catch(e){}
-    }
+      comboEl.textContent = "x" + S.combo;
+      critEl.textContent = Math.round(S.critChance * 100) + "%";
 
-    function floatText(x, y, text){
-      const el = document.createElement("div");
-      el.className = "float";
-      el.textContent = text;
+      const need = xpNeed(S.level);
+      levelEl.textContent = S.level;
+      xpEl.textContent = S.xp;
+      xpNeedEl.textContent = need;
 
-      // position relative to tapArea
-      const rect = tapArea.getBoundingClientRect();
-      const px = x - rect.left;
-      const py = y - rect.top;
+      regenMsEl.textContent = S.regenMs;
 
-      el.style.left = px + "px";
-      el.style.top  = py + "px";
-      el.style.transform = "translate(-50%, -50%)";
-      tapArea.appendChild(el);
+      // daily status
+      const now = Date.now();
+      const dayMs = 24*60*60*1000;
+      const canDaily = (now - S.lastDailyAt) >= dayMs;
+      dailyEl.textContent = canDaily ? "ready" : "cooldown";
 
-      setTimeout(() => el.remove(), 800);
-    }
+      // shop costs
+      const c = costs();
+      costEnergyEl.textContent = c.energy;
+      costRegenEl.textContent  = c.regen;
+      costCritEl.textContent   = c.crit;
 
-    function bunnyPop(){
-      bunnyWrap.classList.remove("shake");
-      // force reflow to restart animation
-      void bunnyWrap.offsetWidth;
-      bunnyWrap.classList.add("shake");
+      // enable/disable buys
+      buyEnergyBtn.disabled = S.balance < c.energy;
+      buyRegenBtn.disabled  = S.balance < c.regen || S.regenMs <= 1200;
+      buyCritBtn.disabled   = S.balance < c.crit  || S.critChance >= 0.50;
     }
 
     function showToast(msg){
       toast.textContent = msg || "";
       if (!msg) return;
       clearTimeout(showToast._t);
-      showToast._t = setTimeout(()=> toast.textContent="", 900);
+      showToast._t = setTimeout(()=> toast.textContent="", 1100);
     }
 
+    function vibrate(type="light"){
+      try { tg?.HapticFeedback?.impactOccurred(type); } catch(e){}
+      try { navigator.vibrate?.(type==="heavy"?25:15); } catch(e){}
+    }
+
+    function bunnyPop(){
+      bunnyWrap.classList.remove("shake");
+      void bunnyWrap.offsetWidth;
+      bunnyWrap.classList.add("shake");
+    }
+
+    function floatText(x, y, text, color){
+      const el = document.createElement("div");
+      el.className = "float";
+      el.textContent = text;
+      el.style.color = color || "var(--accent)";
+
+      const rect = tapArea.getBoundingClientRect();
+      el.style.left = (x - rect.left) + "px";
+      el.style.top  = (y - rect.top)  + "px";
+      el.style.transform = "translate(-50%, -50%)";
+      tapArea.appendChild(el);
+      setTimeout(()=> el.remove(), 900);
+    }
+
+    function sparks(x, y){
+      const rect = tapArea.getBoundingClientRect();
+      const baseX = x - rect.left;
+      const baseY = y - rect.top;
+      const n = 6;
+      for (let i=0;i<n;i++){
+        const s = document.createElement("div");
+        s.className = "spark";
+        s.style.left = baseX + "px";
+        s.style.top  = baseY + "px";
+        const dx = (Math.random()*120 - 60).toFixed(0) + "px";
+        const dy = (Math.random()*-120 - 30).toFixed(0) + "px";
+        s.style.setProperty("--dx", dx);
+        s.style.setProperty("--dy", dy);
+        tapArea.appendChild(s);
+        setTimeout(()=> s.remove(), 650);
+      }
+    }
+
+    // combo system
+    function updateCombo(now){
+      const comboWindow = 900; // ms между тапающими для удержания combo
+      if (now - S.lastTapAt <= comboWindow){
+        // растём плавно: каждые 4 быстрых тапа +1 множитель
+        // храним "comboEndsAt" чтобы combo не падал мгновенно
+        // можно упростить: повышать шансом — но так стабильнее
+      } else {
+        S.combo = 1;
+      }
+      S.comboEndsAt = now + comboWindow;
+    }
+
+    function maybeIncreaseCombo(now){
+      // считаем серию быстрых тапов
+      // используем xp как временный счётчик? нет. сделаем отдельный счётчик в памяти (не сохраняем)
+      // но можно и сохранить — не важно.
+    }
+
+    let fastStreak = 0;
+
     function tap(x, y){
-      if (energy <= 0){
+      const now = Date.now();
+
+      // combo decay
+      if (now > S.comboEndsAt) {
+        S.combo = 1;
+        fastStreak = 0;
+      }
+
+      if (S.energy <= 0){
         showToast("No energy 😵 wait regen...");
         return;
       }
-      balance += 1;
-      energy  -= 1;
+
+      // update combo based on speed
+      const comboWindow = 900;
+      if (now - S.lastTapAt <= comboWindow){
+        fastStreak++;
+        if (fastStreak % 4 === 0 && S.combo < 10){
+          S.combo++;
+          showToast("🔥 Combo x" + S.combo);
+          vibrate("light");
+        }
+      } else {
+        fastStreak = 1;
+        S.combo = 1;
+      }
+      S.lastTapAt = now;
+      S.comboEndsAt = now + comboWindow;
+
+      // crit
+      const isCrit = Math.random() < S.critChance;
+      const baseGain = isCrit ? 5 : 1;
+      const gain = baseGain * S.combo;
+
+      // spend energy
+      S.energy -= 1;
+
+      // earn
+      S.balance += gain;
+
+      // xp
+      S.xp += gain;
+      let need = xpNeed(S.level);
+      while (S.xp >= need){
+        S.xp -= need;
+        S.level++;
+        need = xpNeed(S.level);
+        showToast("🆙 LEVEL UP: " + S.level);
+        vibrate("heavy");
+      }
+
       save();
       render();
-      vibrate();
+
       bunnyPop();
-      floatText(x, y, "+1 BIT");
+      sparks(x, y);
+      floatText(x, y, `+${gain} BIT`, isCrit ? "var(--danger)" : "var(--accent)");
+      vibrate(isCrit ? "heavy" : "light");
     }
 
-    // button tap
-    document.getElementById("bitBtn").addEventListener("click", (e)=>{
+    // daily bonus
+    function tryDaily(){
+      const now = Date.now();
+      const dayMs = 24*60*60*1000;
+      if ((now - S.lastDailyAt) < dayMs){
+        showToast("Daily ещё не готов 🎁");
+        return;
+      }
+      const bonus = 25 + (S.level * 2);
+      S.balance += bonus;
+      S.lastDailyAt = now;
+      save();
+      render();
+      showToast("🎁 Daily +" + bonus + " BIT");
+      vibrate("heavy");
+    }
+
+    // regen
+    setInterval(()=>{
+      if (S.energy < S.maxEnergy){
+        S.energy += 1;
+        save();
+        render();
+        regenState.textContent = "+1";
+        setTimeout(()=> regenState.textContent="ready", 350);
+      }
+    }, () => S.regenMs);
+
+    // IMPORTANT: interval above can't change dynamically via function in JS.
+    // We'll run our own loop instead:
+    let regenTimer = null;
+    function startRegenLoop(){
+      if (regenTimer) clearInterval(regenTimer);
+      regenTimer = setInterval(()=>{
+        if (S.energy < S.maxEnergy){
+          S.energy += 1;
+          save();
+          render();
+          regenState.textContent = "+1";
+          setTimeout(()=> regenState.textContent="ready", 350);
+        }
+      }, S.regenMs);
+    }
+
+    // events
+    document.getElementById("tapBtn").addEventListener("click", ()=>{
       const r = tapArea.getBoundingClientRect();
-      tap(r.left + r.width/2, r.top + r.height/2);
+      tap(r.left + r.width/2, r.top + r.height*0.40);
     });
 
-    // tap bunny (mouse)
-    bunnyWrap.addEventListener("click", (e)=>{
-      tap(e.clientX, e.clientY);
-    });
-
-    // tap bunny (touch) — чтоб координаты были точные на телефоне
+    bunnyWrap.addEventListener("click", (e)=> tap(e.clientX, e.clientY));
     bunnyWrap.addEventListener("touchstart", (e)=>{
       const t = e.touches?.[0];
       if (!t) return;
       tap(t.clientX, t.clientY);
     }, {passive:true});
 
-    // reset
     document.getElementById("resetBtn").addEventListener("click", ()=>{
-      balance = 0;
-      energy = MAX_ENERGY;
+      if (!confirm("Reset progress?")) return;
+      S = {...DEFAULT};
       save();
+      fastStreak = 0;
       render();
+      startRegenLoop();
       showToast("Reset ✅");
       try { tg?.HapticFeedback?.notificationOccurred("success"); } catch(e){}
     });
 
-    // regen
-    setInterval(()=>{
-      if (energy < MAX_ENERGY){
-        energy += 1;
-        save();
-        render();
-        regenState.textContent = "regen +1";
-        setTimeout(()=> regenState.textContent="ready", 350);
-      }
-    }, REGEN_MS);
+    // shop modal
+    function openShop(){ modalBack.style.display = "flex"; }
+    function closeShop(){ modalBack.style.display = "none"; }
 
+    shopBtn.addEventListener("click", openShop);
+    closeModal.addEventListener("click", closeShop);
+    modalBack.addEventListener("click", (e)=>{
+      if (e.target === modalBack) closeShop();
+    });
+
+    // buys
+    buyEnergyBtn.addEventListener("click", ()=>{
+      const c = costs().energy;
+      if (S.balance < c) return;
+      S.balance -= c;
+      S.maxEnergy += 5;
+      S.energy = Math.min(S.energy + 5, S.maxEnergy);
+      save(); render();
+      showToast("⚡ Max energy upgraded!");
+      vibrate("heavy");
+      startRegenLoop();
+    });
+
+    buyRegenBtn.addEventListener("click", ()=>{
+      const c = costs().regen;
+      if (S.balance < c || S.regenMs <= 1200) return;
+      S.balance -= c;
+      S.regenMs = Math.max(1200, S.regenMs - 300);
+      save(); render();
+      showToast("⏱ Regen быстрее!");
+      vibrate("heavy");
+      startRegenLoop();
+    });
+
+    buyCritBtn.addEventListener("click", ()=>{
+      const c = costs().crit;
+      if (S.balance < c || S.critChance >= 0.50) return;
+      S.balance -= c;
+      S.critChance = Math.min(0.50, S.critChance + 0.05);
+      save(); render();
+      showToast("💥 Crit chance +5%");
+      vibrate("heavy");
+    });
+
+    // daily click via pill
+    document.querySelectorAll(".pill").forEach(p=>{
+      if (p.textContent.includes("Daily")){
+        p.style.cursor = "pointer";
+        p.title = "Click for daily bonus";
+        p.addEventListener("click", tryDaily);
+      }
+    });
+
+    // init
     render();
+    startRegenLoop();
+    showToast("Tap! Быстрые клики = combo 🔥");
+
   </script>
 </body>
 </html>
