@@ -7,20 +7,28 @@
   <style>
     body {
       margin: 0;
-      background: #0f0f0f;
+      background: linear-gradient(180deg, #0f0f0f, #1a1a1a);
       color: white;
       font-family: Arial, sans-serif;
       text-align: center;
-      padding: 40px;
+      padding: 30px;
     }
 
     h1 {
-      font-size: 28px;
+      font-size: 24px;
+      margin-bottom: 10px;
     }
 
-    #counter {
-      font-size: 48px;
-      margin: 20px 0;
+    .card {
+      background: #1f1f1f;
+      padding: 20px;
+      border-radius: 16px;
+      margin: 15px 0;
+    }
+
+    .big {
+      font-size: 42px;
+      margin: 10px 0;
     }
 
     button {
@@ -35,14 +43,27 @@
     button:active {
       transform: scale(0.95);
     }
+
+    .energy {
+      color: #ffcc00;
+      margin-top: 10px;
+    }
   </style>
 </head>
 
 <body>
 
 <h1 id="username">Loading...</h1>
-<div id="counter">0</div>
-<button onclick="addBit()">BIT 🔥</button>
+
+<div class="card">
+  <div>💰 BIT Balance</div>
+  <div id="balance" class="big">0</div>
+</div>
+
+<div class="card">
+  <button onclick="addBit()">⚡ BIT</button>
+  <div class="energy">Energy: <span id="energy">10</span>/10</div>
+</div>
 
 <script>
   let tg = window.Telegram.WebApp;
@@ -55,12 +76,33 @@
       "Welcome, " + (user.first_name || "Degen");
   }
 
-  let count = 0;
+  let balance = localStorage.getItem("balance") ? parseInt(localStorage.getItem("balance")) : 0;
+  let energy = localStorage.getItem("energy") ? parseInt(localStorage.getItem("energy")) : 10;
+
+  document.getElementById("balance").innerText = balance;
+  document.getElementById("energy").innerText = energy;
 
   function addBit() {
-    count++;
-    document.getElementById("counter").innerText = count;
+    if (energy > 0) {
+      balance++;
+      energy--;
+
+      document.getElementById("balance").innerText = balance;
+      document.getElementById("energy").innerText = energy;
+
+      localStorage.setItem("balance", balance);
+      localStorage.setItem("energy", energy);
+    }
   }
+
+  // Восстановление энергии
+  setInterval(() => {
+    if (energy < 10) {
+      energy++;
+      document.getElementById("energy").innerText = energy;
+      localStorage.setItem("energy", energy);
+    }
+  }, 3000);
 </script>
 
 </body>
