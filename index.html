@@ -1,29 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Bit Them All</title>
+  <title>Bit Them All - Degen Edition</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body {
       margin: 0;
+      font-family: 'Arial', sans-serif;
       background: linear-gradient(180deg, #0f0f0f, #1a1a1a);
-      color: white;
-      font-family: Arial, sans-serif;
+      color: #fff;
       text-align: center;
       padding: 30px;
     }
 
     h1 {
-      font-size: 24px;
+      font-size: 28px;
       margin-bottom: 10px;
     }
 
     .card {
       background: #1f1f1f;
-      padding: 20px;
       border-radius: 16px;
-      margin: 15px 0;
+      padding: 20px;
+      margin: 15px auto;
+      width: 250px;
     }
 
     .big {
@@ -38,6 +39,8 @@
       font-size: 20px;
       border-radius: 12px;
       cursor: pointer;
+      position: relative;
+      overflow: hidden;
     }
 
     button:active {
@@ -48,12 +51,35 @@
       color: #ffcc00;
       margin-top: 10px;
     }
+
+    #bunny {
+      width: 120px;
+      margin: 20px auto;
+      display: block;
+      transition: transform 0.2s;
+    }
+
+    .click-effect {
+      position: absolute;
+      border-radius: 50%;
+      background: #00ff99aa;
+      width: 40px;
+      height: 40px;
+      pointer-events: none;
+      animation: pop 0.4s forwards;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0); opacity: 1; }
+      100% { transform: scale(2); opacity: 0; }
+    }
   </style>
 </head>
-
 <body>
 
 <h1 id="username">Loading...</h1>
+
+<img id="bunny" src="https://i.imgur.com/3fJ1Pbm.png" alt="Degen Bunny">
 
 <div class="card">
   <div>💰 BIT Balance</div>
@@ -61,7 +87,7 @@
 </div>
 
 <div class="card">
-  <button onclick="addBit()">⚡ BIT</button>
+  <button id="bitBtn">⚡ BIT</button>
   <div class="energy">Energy: <span id="energy">10</span>/10</div>
 </div>
 
@@ -70,36 +96,50 @@
   tg.expand();
 
   let user = tg.initDataUnsafe.user;
-
-  if (user) {
-    document.getElementById("username").innerText =
-      "Welcome, " + (user.first_name || "Degen");
-  }
+  if (user) document.getElementById("username").innerText = "Welcome, " + (user.first_name || "Degen");
 
   let balance = localStorage.getItem("balance") ? parseInt(localStorage.getItem("balance")) : 0;
   let energy = localStorage.getItem("energy") ? parseInt(localStorage.getItem("energy")) : 10;
 
-  document.getElementById("balance").innerText = balance;
-  document.getElementById("energy").innerText = energy;
+  const balanceEl = document.getElementById("balance");
+  const energyEl = document.getElementById("energy");
+  const bitBtn = document.getElementById("bitBtn");
+  const bunny = document.getElementById("bunny");
 
-  function addBit() {
-    if (energy > 0) {
-      balance++;
-      energy--;
+  balanceEl.innerText = balance;
+  energyEl.innerText = energy;
 
-      document.getElementById("balance").innerText = balance;
-      document.getElementById("energy").innerText = energy;
+  function addBit(e) {
+    if (energy <= 0) return;
 
-      localStorage.setItem("balance", balance);
-      localStorage.setItem("energy", energy);
-    }
+    balance++;
+    energy--;
+    balanceEl.innerText = balance;
+    energyEl.innerText = energy;
+    localStorage.setItem("balance", balance);
+    localStorage.setItem("energy", energy);
+
+    // Анимация кнопки
+    bunny.style.transform = "scale(1.2)";
+    setTimeout(()=> bunny.style.transform="scale(1)", 100);
+
+    // Эффект клика
+    const circle = document.createElement("div");
+    circle.classList.add("click-effect");
+    const rect = bitBtn.getBoundingClientRect();
+    circle.style.left = (e.clientX - rect.left - 20) + "px";
+    circle.style.top = (e.clientY - rect.top - 20) + "px";
+    bitBtn.appendChild(circle);
+    setTimeout(() => circle.remove(), 400);
   }
+
+  bitBtn.addEventListener("click", addBit);
 
   // Восстановление энергии
   setInterval(() => {
     if (energy < 10) {
       energy++;
-      document.getElementById("energy").innerText = energy;
+      energyEl.innerText = energy;
       localStorage.setItem("energy", energy);
     }
   }, 3000);
